@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
-public class GrpcWorker implements Runnable, HasLogger {
+public class GrpcWorker implements HasLogger {
     private final Server server;
 
     final int port;
@@ -27,8 +27,7 @@ public class GrpcWorker implements Runnable, HasLogger {
                 .addService(new LinerServerImpl(liner2))
                 .build();
     }
-
-    @Override
+    
     public void run() {
         try {
             getLogger().info("Listing to gRPC on port {}", port);

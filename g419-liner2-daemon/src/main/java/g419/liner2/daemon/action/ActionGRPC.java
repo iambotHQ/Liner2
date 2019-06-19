@@ -54,6 +54,6 @@ public class ActionGRPC extends Action {
     @Override
     public void run() throws Exception {
         final GrpcWorker worker = new GrpcWorker(grpcHostname, Integer.parseInt(grpcPort), modelPath);
-        (new Thread(worker)).start();
+        worker.run();
     }
 }
