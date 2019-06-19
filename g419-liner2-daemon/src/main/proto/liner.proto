@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "g419.liner2.daemon.utils";
+option java_outer_classname = "LinerProto";
+option objc_class_prefix = "HLW";
+
+package liner;
+
+service Liner {
+  rpc TagNamedEntities (TagRequest) returns (TagResponse) {}
+}
+
+message TagRequest {
+  string text = 1;
+}
+
+message TagResponse {
+  repeated Entity entites = 1;
+}
+
+enum EntityType {
+   GEOG_NAME = 0;
+   ORG_NAME = 1;
+   PERS_NAME = 2;
+   PERS_NAME_ADD_NAME = 3;
+   PERS_NAME_FORENAME = 4;
+   PERS_NAME_SURNAME = 5;
+   PLACE_NAME = 6;
+   PLACE_NAME_BLOC = 7;
+   PLACE_NAME_COUNTRY = 8;
+   PLACE_NAME_DISTRICT = 9;
+   PLACE_NAME_REGION = 10;
+   PLACE_NAME_SETTLEMENT = 11;
+   DATE = 12;
+   TIME = 13;
+}
+
+message Entity {
+  string orth = 1;
+  string lemma = 2;
+  uint32 entityId = 3;
+  EntityType entityType = 4;
+}

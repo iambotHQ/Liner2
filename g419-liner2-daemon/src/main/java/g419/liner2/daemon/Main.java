@@ -1,6 +1,7 @@
 package g419.liner2.daemon;
 
 import g419.lib.cli.ActionSelector;
+import g419.liner2.daemon.action.ActionGRPC;
 import g419.liner2.daemon.action.ActionRabbitMq;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -33,6 +34,7 @@ public class Main {
     final ActionSelector main = new ActionSelector("./liner2-daemon");
     main.setCredits(info.toString());
     main.add(new ActionRabbitMq());
+    main.add(new ActionGRPC());
     main.run(args);
   }
 

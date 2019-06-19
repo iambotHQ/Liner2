@@ -1,10 +1,45 @@
 description = "g419-liner2-daemon -- obsługa Liner2 w trybie demona"
 
 apply plugin: "application"
+apply plugin: "com.google.protobuf"
+
+sourceSets {
+    main {
+        java {
+            srcDirs "build/generated/source/proto/main/grpc"
+            srcDirs "build/generated/source/proto/main/java"
+        }
+    }
+}
 
 def main = "g419.liner2.daemon.Main"
 
 mainClassName = main
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.8'
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.7.1"
+    }
+    plugins {
+        grpc {
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.21.0'
+        }
+    }
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {}
+        }
+    }
+}
 
 run {
     if (project.hasProperty("appArgs")) {
@@ -25,6 +60,9 @@ dependencies {
     compile 'org.json:json:20141113'
     compile 'mysql:mysql-connector-java:5.1.10'
     compile 'com.rabbitmq:amqp-client:5.5.0'
+    compile 'io.grpc:grpc-netty-shaded:1.21.0'
+    compile 'io.grpc:grpc-protobuf:1.21.0'
+    compile 'io.grpc:grpc-stub:1.21.0'
     compile project(":g419-corpus")
     compile project(":g419-liner2-core")
     compile project(":g419-lib-cli")
