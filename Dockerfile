@@ -120,3 +120,6 @@ WORKDIR /liner2
 
 RUN wget -O liner26_model_ner_nkjp.zip https://clarin-pl.eu/dspace/bitstream/handle/11321/598/liner26_model_ner_nkjp.zip
 RUN unzip liner26_model_ner_nkjp.zip
+
+EXPOSE 5010
+ENTRYPOINT ["./liner2-daemon", "grpc", "-m", "liner26_model_ner_nkjp/config-nkjp-poleval2018.ini"]

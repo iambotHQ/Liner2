@@ -16,7 +16,7 @@ public class ActionGRPC extends Action {
 
     public static final String OPTION_PORT = "P";
     public static final String OPTION_PORT_LONG = "port";
-    public static final String OPTION_PORT_DEFAULT = "50051";
+    public static final String OPTION_PORT_DEFAULT = "5010";
     public static final String OPTION_PORT_ARG = "name";
     public static final String OPTION_PORT_DESC = "gRPC port";
 
