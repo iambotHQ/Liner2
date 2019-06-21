@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 option java_multiple_files = true;
-option java_package = "g419.liner2.daemon.utils";
+option java_package = "g419.liner2.daemon.grpc";
 option java_outer_classname = "LinerProto";
 option objc_class_prefix = "HLW";
 
@@ -19,7 +19,7 @@ message TagResponse {
   repeated Entity entites = 1;
 }
 
-enum EntityType {
+enum AnnotationType {
    GEOG_NAME = 0;
    ORG_NAME = 1;
    PERS_NAME = 2;
@@ -36,9 +36,13 @@ enum EntityType {
    TIME = 13;
 }
 
+message Annotation {
+    uint32 channelIdx = 1;
+    AnnotationType annotationType = 2;
+}
+
 message Entity {
   string orth = 1;
   string lemma = 2;
-  uint32 entityId = 3;
-  EntityType entityType = 4;
+  repeated Annotation annotations = 3;
 }
