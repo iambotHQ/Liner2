@@ -88,6 +88,7 @@ public class GrpcWorker implements HasLogger {
         @Override
         public void tagNamedEntities(TagRequest request,
                                      io.grpc.stub.StreamObserver<TagResponse> responseObserver) {
+            getLogger().debug("Tag request: " + request.getText());
             TagResponse.Builder reply = TagResponse.newBuilder();
 
             try {
@@ -103,21 +104,13 @@ public class GrpcWorker implements HasLogger {
                 for(Sentence sentence : chunked.keySet()) {
                     final LinkedHashSet<Annotation> chunks = sentence.getChunks();
 
-                    if(chunks.size() > 0) {
-                        Entity.Builder entBuilder = null;
+                    for (Annotation ann : chunks) {
+                        Entity.Builder entBuilder = Entity.newBuilder()
+                                .setOrth(ann.getBaseText())
+                                .setLemma(ann.getLemma())
+                                .setAnnotationType(mapAnnotationType(ann.getType().toLowerCase()))
+                                .setChannelIdx(ann.getChannelIdx());
 
-                        for (Annotation ann : chunks) {
-                            if(entBuilder == null) {
-                                entBuilder = Entity.newBuilder()
-                                        .setOrth(ann.getBaseText())
-                                        .setLemma(ann.getLemma());
-                            }
-
-                            entBuilder.addAnnotations(g419.liner2.daemon.grpc.Annotation.newBuilder()
-                                    .setAnnotationType(mapAnnotationType(ann.getType().toLowerCase()))
-                                    .setChannelIdx(ann.getChannelIdx())
-                                    .build());
-                        }
                         reply.addEntities(entBuilder.build());
                     }
                 }
