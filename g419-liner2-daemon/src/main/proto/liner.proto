@@ -36,9 +36,13 @@ enum AnnotationType {
    TIME = 13;
 }
 
+message Annotation {
+    uint32 channelIdx = 1;
+    AnnotationType annotationType = 2;
+}
+
 message Entity {
   string orth = 1;
   string lemma = 2;
-  uint32 channelIdx = 3;
-  AnnotationType annotationType = 4;
+  repeated Annotation annotations = 3;
 }

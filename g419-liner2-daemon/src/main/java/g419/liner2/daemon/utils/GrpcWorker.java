@@ -3,18 +3,15 @@ package g419.liner2.daemon.utils;
 import g419.corpus.HasLogger;
 import g419.corpus.io.reader.AbstractDocumentReader;
 import g419.corpus.io.reader.ReaderFactory;
+import g419.corpus.structure.*;
 import g419.corpus.structure.Annotation;
-import g419.corpus.structure.AnnotationSet;
-import g419.corpus.structure.Document;
-import g419.corpus.structure.Sentence;
 import g419.liner2.core.Liner2;
 import g419.liner2.daemon.grpc.*;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import org.apache.commons.io.IOUtils;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 
 public class GrpcWorker implements HasLogger {
@@ -88,7 +85,6 @@ public class GrpcWorker implements HasLogger {
         @Override
         public void tagNamedEntities(TagRequest request,
                                      io.grpc.stub.StreamObserver<TagResponse> responseObserver) {
-            getLogger().debug("Tag request: " + request.getText());
             TagResponse.Builder reply = TagResponse.newBuilder();
 
             try {
@@ -101,18 +97,31 @@ public class GrpcWorker implements HasLogger {
                 reader.close();
 
                 Map<Sentence, AnnotationSet> chunked = linerService.chunk(text);
+                getLogger().debug("Num chunks: " + chunked.size());
                 for(Sentence sentence : chunked.keySet()) {
-                    final LinkedHashSet<Annotation> chunks = sentence.getChunks();
+                    final List<Token> tokens = sentence.getTokens();
 
-                    for (Annotation ann : chunks) {
-                        Entity.Builder entBuilder = Entity.newBuilder()
-                                .setOrth(ann.getBaseText())
-                                .setLemma(ann.getLemma())
-                                .setAnnotationType(mapAnnotationType(ann.getType().toLowerCase()))
-                                .setChannelIdx(ann.getChannelIdx());
+                    getLogger().debug("Num tokens: " + tokens.size());
+                    for(int i = 0; i < tokens.size(); i++) {
+                        Token token = tokens.get(i);
+                        List<Annotation> chunks = sentence.getChunksAt(i);
+                        getLogger().debug("Token: " + token.getOrth() + ", num chunks: " + chunks.size());
 
-                        reply.addEntities(entBuilder.build());
+                        if(chunks.size() > 0) {
+                            Entity.Builder entBuilder = Entity.newBuilder()
+                                    .setOrth(token.getOrth())
+                                    .setLemma(token.getDisambTag().getBase());
+
+                            for (Annotation ann : chunks) {
+                                entBuilder.addAnnotations(g419.liner2.daemon.grpc.Annotation.newBuilder()
+                                        .setAnnotationType(mapAnnotationType(ann.getType().toLowerCase()))
+                                        .setChannelIdx(ann.getChannelIdx())
+                                        .build());
+                            }
+                            reply.addEntities(entBuilder.build());
+                        }
                     }
+
                 }
 
                 responseObserver.onNext(reply.build());
