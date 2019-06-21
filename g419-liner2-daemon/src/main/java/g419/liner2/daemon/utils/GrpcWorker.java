@@ -11,6 +11,7 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import org.apache.commons.io.IOUtils;
 import java.io.IOException;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -96,32 +97,47 @@ public class GrpcWorker implements HasLogger {
                 Document text = reader.nextDocument();
                 reader.close();
 
-                Map<Sentence, AnnotationSet> chunked = linerService.chunk(text);
-                getLogger().debug("Num chunks: " + chunked.size());
-                for(Sentence sentence : chunked.keySet()) {
+                linerService.chunkInPlace(text);
+                getLogger().debug("Num sentences: " + text.getSentences().size());
+                int annChanelOffset = 0;
+                for(int i = 0, s = text.getSentences().size(); i < s; i++) {
+                    Sentence sentence = text.getSentences().get(i);
+                    LinkedHashSet<Annotation> chunks = sentence.getChunks();
                     final List<Token> tokens = sentence.getTokens();
 
                     getLogger().debug("Num tokens: " + tokens.size());
-                    for(int i = 0; i < tokens.size(); i++) {
-                        Token token = tokens.get(i);
-                        List<Annotation> chunks = sentence.getChunksAt(i);
-                        getLogger().debug("Token: " + token.getOrth() + ", num chunks: " + chunks.size());
+                    int biggestAnnIdx = 0;
+                    for(int j = 0; j < tokens.size(); j++) {
+                        Token token = tokens.get(j);
+                        List<Annotation> chunksInToken = sentence.getChunksAt(i + j);
+                        getLogger().debug("Token: " + token.getOrth() + ", num chunks: " + chunksInToken.size());
 
-                        if(chunks.size() > 0) {
+                        if(chunksInToken.size() > 0) {
                             Entity.Builder entBuilder = Entity.newBuilder()
                                     .setOrth(token.getOrth())
                                     .setLemma(token.getDisambTag().getBase());
 
-                            for (Annotation ann : chunks) {
+                            for (Annotation ann : chunksInToken) {
+                                int annIdx = 1;
+                                for (final Annotation a : chunks) {
+                                    if (a.getType().equals(ann.getType())) {
+                                        if (a == ann) {
+                                            break;
+                                        }
+                                        annIdx++;
+                                    }
+                                }
+                                biggestAnnIdx = Math.max(biggestAnnIdx, annIdx);
+
                                 entBuilder.addAnnotations(g419.liner2.daemon.grpc.Annotation.newBuilder()
                                         .setAnnotationType(mapAnnotationType(ann.getType().toLowerCase()))
-                                        .setChannelIdx(ann.getChannelIdx())
+                                        .setChannelIdx(annIdx + annChanelOffset)
                                         .build());
                             }
                             reply.addEntities(entBuilder.build());
                         }
                     }
-
+                    annChanelOffset += biggestAnnIdx;
                 }
 
                 responseObserver.onNext(reply.build());

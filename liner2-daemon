@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Get bash script location location
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 
