@@ -27,12 +27,13 @@ public class GrpcWorker implements HasLogger {
                 .addService(new LinerServerImpl(liner2))
                 .build();
     }
-    
+
     public void run() {
         try {
             getLogger().info("Listing to gRPC on port {}", port);
             server.start();
-        } catch (final IOException ex) {
+            server.awaitTermination();
+        } catch (final IOException | InterruptedException ex) {
             throw new RuntimeException(ex);
         }
     }
