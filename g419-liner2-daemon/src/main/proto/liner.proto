@@ -16,7 +16,7 @@ message TagRequest {
 }
 
 message TagResponse {
-  repeated Entity entites = 1;
+  repeated Entity entities = 1;
 }
 
 enum AnnotationType {
