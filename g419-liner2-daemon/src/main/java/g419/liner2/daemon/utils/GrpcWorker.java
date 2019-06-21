@@ -118,7 +118,7 @@ public class GrpcWorker implements HasLogger {
                                     .setChannelIdx(ann.getChannelIdx())
                                     .build());
                         }
-                        reply.addEntites(entBuilder.build());
+                        reply.addEntities(entBuilder.build());
                     }
                 }
 
