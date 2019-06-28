@@ -109,7 +109,7 @@ public class GrpcWorker implements HasLogger {
                     int biggestAnnIdx = 0;
                     for(int j = 0; j < tokens.size(); j++) {
                         Token token = tokens.get(j);
-                        List<Annotation> chunksInToken = sentence.getChunksAt(i + j);
+                        List<Annotation> chunksInToken = sentence.getChunksAt(j);
                         getLogger().debug("Token: " + token.getOrth() + ", num chunks: " + chunksInToken.size());
 
                         if(chunksInToken.size() > 0) {
