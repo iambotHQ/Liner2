@@ -58,7 +58,7 @@ public class GrpcWorker implements HasLogger {
                     return AnnotationType.ORG_NAME;
                 case "persname":
                     return AnnotationType.PERS_NAME;
-                case "persname_addName":
+                case "persname_addname":
                     return AnnotationType.PERS_NAME_ADD_NAME;
                 case "persname_forename":
                     return AnnotationType.PERS_NAME_FORENAME;
